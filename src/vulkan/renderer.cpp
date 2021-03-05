@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <vector>
 #include <iostream>
+#include <set>
 
 #include "vulkan/renderer.hpp"
 #include "window.hpp"
@@ -25,16 +26,18 @@ void plxVulkan::renderer::renderer_init(){
 void plxVulkan::renderer::initVulkan(){
     createInstance();
     SetupVulkanDebugger();
+    CreateSurface();
     pickPhysicalDevice();
     createLogicalDevice();
 }
 
 void plxVulkan::renderer::cleanup(){
+    vkDestroyDevice(device, NULL);
     if(enableDebugger){
         layer.CleanUp();
     }
 
-    vkDestroyDevice(device, NULL);
+    vkDestroySurfaceKHR(instance, surface, NULL);
     vkDestroyInstance(instance, NULL);
 }
 
@@ -90,58 +93,97 @@ void plxVulkan::renderer::mainLoop(){
     }
 }
 
+void plxVulkan::renderer::CreateSurface(){
+    if(glfwCreateWindowSurface(instance, windowInstance->GetWindow(), NULL, &surface) != VK_SUCCESS){
+        std::runtime_error{ "Failed to create surface" };
+    }
+}
+
 void plxVulkan::renderer::pickPhysicalDevice(){
     physicalDevices = pxPhysicalDevices{ &instance };
-    const std::vector<pxPhysicalDevice> devices { physicalDevices.GetDevices() };
+    std::vector<pxPhysicalDevice>& devices { physicalDevices.GetDevices() };
 
-    for(const pxPhysicalDevice& device : devices){ 
+    for(pxPhysicalDevice& device : devices){ 
         uint32_t queueFamilycount { 0 };
         vkGetPhysicalDeviceQueueFamilyProperties2(device.GetPhysicalDevice(), &queueFamilycount, NULL);
         
         std::vector<VkQueueFamilyProperties2> queueFamilyProperties { queueFamilycount };
+        for(auto& queue: queueFamilyProperties){
+            queue.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2;
+        }
+
+        uint32_t index{ 0 };
         vkGetPhysicalDeviceQueueFamilyProperties2(device.GetPhysicalDevice(), &queueFamilycount, queueFamilyProperties.data());
         for (const auto& queueFamily : queueFamilyProperties){
             if (queueFamily.queueFamilyProperties.queueFlags & VK_QUEUE_GRAPHICS_BIT){
-                physicalDevices.SetPrimaryDevice(device);
+                device.GetQueueFamilyIndices().graphicFamilyIndex = index;
             }
+
+            VkBool32 presentationSupport{ VK_FALSE };
+            vkGetPhysicalDeviceSurfaceSupportKHR(device.GetPhysicalDevice(), index, surface, &presentationSupport);
+            if(presentationSupport == VK_TRUE){
+                device.GetQueueFamilyIndices().presentFamilyIndex = index;
+            }
+
+            if(device.IsValid()){
+                physicalDevices.SetPrimaryDevice(device);
+                break;
+            }
+            ++index;
         }
+
+        if(device.IsValid()) break;
     }
 
-   if (physicalDevices.GetPrimaryDevice().GetPhysicalDevice() == VK_NULL_HANDLE){
-       throw std::runtime_error{ "Could not find a suitable GPU" };
-   }
+    auto primaryDevice{ physicalDevices.GetPrimaryDevice() };
+    if (!primaryDevice.IsValid()) {
+        throw std::runtime_error{ "Could not find a suitable GPU" };
+    }
 }
 
 void plxVulkan::renderer::createLogicalDevice(){
     float queuePriority{ 1.0F };
-    VkDeviceQueueCreateInfo queueCreateInfo{};
-    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfo.pNext = NULL;
-    queueCreateInfo.queueFamilyIndex = 0; // TODO
-    queueCreateInfo.queueCount = 0; // TODO
-    queueCreateInfo.pQueuePriorities = &queuePriority;
+    auto primaryDevice{ physicalDevices.GetPrimaryDevice() };
+    auto deviceExtensions{ extensions::GetRequiredDeviceExtensions() };
+    std::vector<VkDeviceQueueCreateInfo> queueFamilies;
+    std::set<uint32_t> uniqueFamilies{ primaryDevice.GetQueueFamilyIndices().graphicFamilyIndex.value(), primaryDevice.GetQueueFamilyIndices().presentFamilyIndex.value() };
+    for(uint32_t queueIndex : uniqueFamilies){
+        VkDeviceQueueCreateInfo queueCreateInfo{};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.pNext = NULL;
+        queueCreateInfo.queueFamilyIndex = queueIndex;
+        queueCreateInfo.queueCount = 1; // Possiby TODO
+        queueCreateInfo.pQueuePriorities = &queuePriority;
+        queueFamilies.push_back(queueCreateInfo);
+    }
 
     VkPhysicalDeviceFeatures physicalDeviceFeatures{}; // Possibly TODO: Just enable stuff once engine is done
     VkDeviceCreateInfo deviceCreateInfo{};
     deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     deviceCreateInfo.pNext = NULL;
     deviceCreateInfo.flags = 0;
-    deviceCreateInfo.queueCreateInfoCount = 1;
-    deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
-    deviceCreateInfo.enabledExtensionCount = 0; // TODO
-    deviceCreateInfo.ppEnabledExtensionNames = 0; // TODO
+    deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueFamilies.size());
+    deviceCreateInfo.pQueueCreateInfos = queueFamilies.data();
+    deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+    deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
     deviceCreateInfo.pEnabledFeatures = &physicalDeviceFeatures;
 
     if(vkCreateDevice(physicalDevices.GetPrimaryDevice().GetPhysicalDevice(), &deviceCreateInfo, NULL, &device) != VK_SUCCESS){
         std::runtime_error{ "Logical device was unable to be created" };
     }
 
-    VkDeviceQueueInfo2 queueInfo{};
-    queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_INFO_2;
-    queueInfo.pNext = NULL;
-    queueInfo.flags = 0; // TODO
-    queueInfo.queueFamilyIndex = 0; // TODO
-    queueInfo.queueIndex = 0; // TODO.
+    VkDeviceQueueInfo2 graphicQueueInfo{};
+    graphicQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_INFO_2;
+    graphicQueueInfo.pNext = NULL;
+    graphicQueueInfo.queueFamilyIndex = primaryDevice.GetQueueFamilyIndices().graphicFamilyIndex.value();
+    graphicQueueInfo.queueIndex = 0; // Possibly TODO.
 
-    vkGetDeviceQueue2(device, &queueInfo, &queue);
+    VkDeviceQueueInfo2 presentQueueInfo{};
+    presentQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_INFO_2;
+    presentQueueInfo.pNext = NULL;
+    presentQueueInfo.queueFamilyIndex = primaryDevice.GetQueueFamilyIndices().presentFamilyIndex.value();
+    presentQueueInfo.queueIndex = 0; // Possibly TODO.
+
+    vkGetDeviceQueue2(device, &graphicQueueInfo, &graphicsQueue);
+    vkGetDeviceQueue2(device, &presentQueueInfo, &presentQueue);
 }

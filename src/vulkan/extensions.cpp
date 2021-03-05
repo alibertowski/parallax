@@ -20,3 +20,7 @@ std::vector<const char*> plxVulkan::extensions::GetRequiredInstanceExtensions(){
 
     return finalExtensions;
 }
+
+std::vector<const char*> plxVulkan::extensions::GetRequiredDeviceExtensions(){
+    return std::vector<const char*>{};
+}

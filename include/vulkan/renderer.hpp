@@ -17,12 +17,15 @@ namespace plxVulkan{
         VkInstance instance;
         pxPhysicalDevices physicalDevices;
         VkDevice device;
-        VkQueue queue;
+        VkQueue graphicsQueue;
+        VkQueue presentQueue;
+        VkSurfaceKHR surface;
         layers layer;
 
         void createInstance();
         void initVulkan();
         void mainLoop();
+        void CreateSurface();
         void pickPhysicalDevice();
         void createLogicalDevice();
         void SetupVulkanDebugger();
