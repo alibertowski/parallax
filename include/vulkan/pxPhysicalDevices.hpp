@@ -10,7 +10,7 @@ namespace plxVulkan{
         pxPhysicalDevices() = default;
         pxPhysicalDevices(const VkInstance* pInstance);
 
-        const inline std::vector<pxPhysicalDevice>& GetDevices() const { return physicalDevices; }
+        inline std::vector<pxPhysicalDevice>& GetDevices() { return physicalDevices; }
         inline pxPhysicalDevice& GetPrimaryDevice() { return primaryDevice; }
         inline void SetPrimaryDevice(const pxPhysicalDevice& device) { primaryDevice = device; } 
 
