@@ -6,50 +6,48 @@
 #include <vector>
 #include <iostream>
 
-#include "renderer.hpp"
+#include "vulkan/renderer.hpp"
 #include "window.hpp"
 #include "settings.hpp"
-#include "pxPhysicalDevices.hpp"
-#include "validation.hpp"
+#include "vulkan/pxPhysicalDevices.hpp"
+#include "vulkan/layers.hpp"
+#include "vulkan/extensions.hpp"
 
-renderer::renderer(window* pWindow){
+plxVulkan::renderer::renderer(window* pWindow){
     windowInstance = pWindow;
 }
 
-void renderer::renderer_init(){
+void plxVulkan::renderer::renderer_init(){
     initVulkan();
     mainLoop();
 }
 
-void renderer::initVulkan(){
+void plxVulkan::renderer::initVulkan(){
     createInstance();
     SetupVulkanDebugger();
     pickPhysicalDevice();
     createLogicalDevice();
 }
 
-void renderer::cleanup(){
-    if(layers::enableLayers){
-        validator.CleanUp();
+void plxVulkan::renderer::cleanup(){
+    if(enableDebugger){
+        layer.CleanUp();
     }
 
     vkDestroyDevice(device, NULL);
     vkDestroyInstance(instance, NULL);
 }
 
-void renderer::SetupVulkanDebugger(){
-    if (!layers::enableLayers) return;
+void plxVulkan::renderer::SetupVulkanDebugger(){
+    if (!enableDebugger) return;
     
-    validator = validation{ &instance };
+    layer = layers{ &instance };
+    layer.Init();
 }
 
-void renderer::createInstance(){
-    if(layers::enableLayers && !validation::CheckLayerSupport()){
-        throw std::runtime_error{ "Layers not supported" };
-    }
-
-    uint32_t extensionCount{ 0 };
-    auto glfwExtensions { glfwGetRequiredInstanceExtensions(&extensionCount) };
+void plxVulkan::renderer::createInstance(){
+    auto requiredLayers{ layers::GetLayers() };
+    auto requiredExtensions{ extensions::GetRequiredInstanceExtensions() };
 
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -65,19 +63,10 @@ void renderer::createInstance(){
     createInfo.flags = 0;
     createInfo.pApplicationInfo = &appInfo;
 
-    if(layers::enableLayers){
-        VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
-        debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-        debugCreateInfo.pNext = NULL;
-        debugCreateInfo.flags = 0;
-        debugCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT;
-        debugCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT;
-        debugCreateInfo.pfnUserCallback = validation::DebugCallback;
-
-        createInfo.enabledLayerCount = static_cast<uint32_t>(layers::layersToEnable.size());
-        createInfo.ppEnabledLayerNames = layers::layersToEnable.data();
+    if(enableDebugger){
+        VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{ layers::PopulateDebuggerMessengerCreateInfo() };
+        createInfo.enabledLayerCount = static_cast<uint32_t>(requiredLayers.size());
+        createInfo.ppEnabledLayerNames = requiredLayers.data();
         createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
     } else {
         createInfo.enabledLayerCount = 0;
@@ -85,15 +74,15 @@ void renderer::createInstance(){
         createInfo.pNext = NULL;
     }
 
-    createInfo.enabledExtensionCount = extensionCount;
-    createInfo.ppEnabledExtensionNames = glfwExtensions;
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());
+    createInfo.ppEnabledExtensionNames = requiredExtensions.data();
 
     if(!vkCreateInstance(&createInfo, NULL, &instance) != VK_SUCCESS){
         std::runtime_error{ "Failed to create Vulkan instance" };
     }
 }
 
-void renderer::mainLoop(){
+void plxVulkan::renderer::mainLoop(){
     std::cout << "Loop started\n";
 
     while (!glfwWindowShouldClose(windowInstance->GetWindow())) {
@@ -101,7 +90,7 @@ void renderer::mainLoop(){
     }
 }
 
-void renderer::pickPhysicalDevice(){
+void plxVulkan::renderer::pickPhysicalDevice(){
     physicalDevices = pxPhysicalDevices{ &instance };
     const std::vector<pxPhysicalDevice> devices { physicalDevices.GetDevices() };
 
@@ -123,7 +112,7 @@ void renderer::pickPhysicalDevice(){
    }
 }
 
-void renderer::createLogicalDevice(){
+void plxVulkan::renderer::createLogicalDevice(){
     float queuePriority{ 1.0F };
     VkDeviceQueueCreateInfo queueCreateInfo{};
     queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;

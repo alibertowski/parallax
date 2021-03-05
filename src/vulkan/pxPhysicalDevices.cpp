@@ -1,9 +1,9 @@
 #include <vulkan/vulkan.h>
 #include <stdexcept>
 
-#include "pxPhysicalDevices.hpp"
+#include "vulkan/pxPhysicalDevices.hpp"
 
-pxPhysicalDevices::pxPhysicalDevices(const VkInstance* pInstance){
+plxVulkan::pxPhysicalDevices::pxPhysicalDevices(const VkInstance* pInstance){
     instance = pInstance;
 
     uint32_t physcDeviceCount{ 0 };
