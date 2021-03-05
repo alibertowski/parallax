@@ -12,6 +12,7 @@
                 "-Wall",
                 "-Wextra",
                 "${workspaceFolder}/src/*.cpp",
+                "${workspaceFolder}/src/vulkan/*.cpp"
                 "-o",
                 "${workspaceFolder}/parallax",
                 "-lglfw",
