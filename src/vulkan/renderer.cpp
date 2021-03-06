@@ -29,6 +29,7 @@ void plxVulkan::renderer::initVulkan(){
     CreateSurface();
     pickPhysicalDevice();
     createLogicalDevice();
+    CreateSwapchain();
 }
 
 void plxVulkan::renderer::cleanup(){
@@ -186,4 +187,54 @@ void plxVulkan::renderer::createLogicalDevice(){
 
     vkGetDeviceQueue2(device, &graphicQueueInfo, &graphicsQueue);
     vkGetDeviceQueue2(device, &presentQueueInfo, &presentQueue);
+}
+
+void plxVulkan::renderer::CreateSwapchain(){
+    auto primaryDevice{ physicalDevices.GetPrimaryDevice() };
+    VkSurfaceCapabilitiesKHR capabilities;
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(primaryDevice.GetPhysicalDevice(), surface, &capabilities);
+
+    VkSurfaceFormatKHR format;
+    uint32_t surfaceFormatCount{ 0 };
+    vkGetPhysicalDeviceSurfaceFormatsKHR(primaryDevice.GetPhysicalDevice(), surface, &surfaceFormatCount, NULL);
+    std::vector<VkSurfaceFormatKHR> surfaceFormats{ surfaceFormatCount };
+    vkGetPhysicalDeviceSurfaceFormatsKHR(primaryDevice.GetPhysicalDevice(), surface, &surfaceFormatCount, surfaceFormats.data());
+    bool selected{ false };
+    for (const auto& availableFormat : surfaceFormats) {
+        if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+            format = availableFormat;
+            selected = true;
+        }
+    }
+    if(!selected){
+        format = surfaceFormats[0];
+    }
+
+    VkPresentModeKHR presentMode;
+    uint32_t presentModeCount{ 0 };
+    vkGetPhysicalDeviceSurfacePresentModesKHR(primaryDevice.GetPhysicalDevice(), surface, &presentModeCount, NULL);
+    std::vector<VkPresentModeKHR> presentModes{ presentModeCount };
+    vkGetPhysicalDeviceSurfacePresentModesKHR(primaryDevice.GetPhysicalDevice(), surface, &presentModeCount, presentModes.data());
+    for(const auto& mode : presentModes){
+        if(mode == VK_PRESENT_MODE_IMMEDIATE_KHR){
+            presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+        }
+
+        presentMode = VK_PRESENT_MODE_FIFO_KHR;
+    }
+
+    VkSwapchainCreateInfoKHR swapCreateInfo{};
+    swapCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    swapCreateInfo.pNext = NULL;
+    swapCreateInfo.flags = 0;
+    swapCreateInfo.surface = surface;
+    swapCreateInfo.minImageCount = capabilities.minImageCount; // TODO: Temporary solutioni
+    swapCreateInfo.imageFormat = format.format;
+    swapCreateInfo.imageColorSpace = format.colorSpace;
+   // swapCreateInfo.imageExtent = 0;
+    swapCreateInfo.presentMode = presentMode;
+
+    if(vkCreateSwapchainKHR(device,  &swapCreateInfo, NULL, &swapchain) != VK_SUCCESS){
+        throw std::runtime_error{ "Swapchain failed to be created" };
+    }
 }

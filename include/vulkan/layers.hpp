@@ -24,7 +24,7 @@ namespace plxVulkan{
         VkDebugUtilsMessengerEXT debugMessenger;
         const VkInstance* instance;
 
-        static VKAPI_PTR VkBool32 DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, 
+        static VkBool32 VKAPI_PTR DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, 
             VkDebugUtilsMessageTypeFlagsEXT messageTypes, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, 
             void* pUserData);
     };
