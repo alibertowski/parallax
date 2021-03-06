@@ -13,7 +13,7 @@ plxVulkan::layers::layers(const VkInstance* pInstance){
     instance = pInstance;
 }
 
-VKAPI_PTR VkBool32 plxVulkan::layers::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, 
+VkBool32 VKAPI_PTR plxVulkan::layers::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, 
     VkDebugUtilsMessageTypeFlagsEXT messageTypes, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData){
     std::cout << "Severity: " << messageSeverity << "\nType: " << messageTypes 
         << "\nMessage: " << pCallbackData->pMessage << "\nUser Data: " << pUserData << "\n\n";

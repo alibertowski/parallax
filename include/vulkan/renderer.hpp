@@ -20,6 +20,7 @@ namespace plxVulkan{
         VkQueue graphicsQueue;
         VkQueue presentQueue;
         VkSurfaceKHR surface;
+        VkSwapchainKHR swapchain;
         layers layer;
 
         void createInstance();
@@ -29,5 +30,6 @@ namespace plxVulkan{
         void pickPhysicalDevice();
         void createLogicalDevice();
         void SetupVulkanDebugger();
+        void CreateSwapchain();
     };
 }
