@@ -6,11 +6,15 @@ RELEASE-CFLAGS = -std=c++17 -O3 -Wall -Wextra -iquote ./include
 
 parallax: src/main.cpp
 	g++ $(CFLAGS) -o ${EXECUTABLE-NAME} $(LDFLAGS) ./src/*.cpp ./src/vulkan/*.cpp
-
+	glslangValidator -V -o shaders/shaders.frag.spv shaders/shaders.frag
+	glslangValidator -V -o shaders/shaders.vert.spv shaders/shaders.vert
+	
 .PHONY: test clean
 
 release:
 	g++ $(RELEASE-CFLAGS) -D NDEBUG -o ${EXECUTABLE-NAME} $(LDFLAGS) ./src/*.cpp ./src/vulkan/*.cpp
+	glslangValidator -V -o shaders/shaders.frag.spv shaders/shaders.frag
+	glslangValidator -V -o shaders/shaders.vert.spv shaders/shaders.vert
 
 test: ${EXECUTABLE-NAME}
 	./${EXECUTABLE-NAME}
@@ -18,3 +22,4 @@ test: ${EXECUTABLE-NAME}
 clean:
 	rm -f ${EXECUTABLE-NAME}
 	rm -f ./*.o
+	rm -f ./shaders/*.spv
