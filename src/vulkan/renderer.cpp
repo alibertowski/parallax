@@ -200,7 +200,7 @@ void plxVulkan::renderer::createLogicalDevice(){
     deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
     deviceCreateInfo.pEnabledFeatures = &physicalDeviceFeatures;
 
-    if(vkCreateDevice(physicalDevices.GetPrimaryDevice().GetPhysicalDevice(), &deviceCreateInfo, NULL, &device) != VK_SUCCESS){
+    if(vkCreateDevice(physicalDevices.GetPrimaryDevice().GetPhysicalDevice(), &deviceCreateInfo, NULL, &device) != VK_SUCCESS) {
         std::runtime_error{ "Logical device was unable to be created" };
     }
 
@@ -249,6 +249,7 @@ void plxVulkan::renderer::CreateSwapchain(){
     for(const auto& mode : presentModes){
         if(mode == VK_PRESENT_MODE_IMMEDIATE_KHR){
             presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+            break;
         }
 
         presentMode = VK_PRESENT_MODE_FIFO_KHR;
@@ -528,6 +529,7 @@ void plxVulkan::renderer::CreateCommandPool(){
 
     VkCommandPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    poolInfo.pNext = NULL;
     poolInfo.queueFamilyIndex = primaryDevice.GetQueueFamilyIndices().graphicFamilyIndex.value();
 
     if (vkCreateCommandPool(device, &poolInfo, NULL, &commandPool) != VK_SUCCESS) {
@@ -540,6 +542,7 @@ void plxVulkan::renderer::CreateCommandBuffers(){
 
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.pNext = NULL;
     allocInfo.commandPool = commandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = (uint32_t) commandBuffers.size();
@@ -551,6 +554,7 @@ void plxVulkan::renderer::CreateCommandBuffers(){
     for (size_t i = 0; i < commandBuffers.size(); i++) {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.pNext = NULL;
 
         if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) {
             throw std::runtime_error("failed to begin recording command buffer!");
