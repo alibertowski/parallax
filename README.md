@@ -1,5 +1,5 @@
 # Parallax
-A for now 2D game engine made in Vulkan and soon OpenGL made just for fun (and learning).
+A 2D game engine (for now) made with C++ using Vulkan and soon OpenGL made just for fun (and learning).
 
 ## Dependencies
 * [Vulkan](https://vulkan.lunarg.com/sdk/home)
@@ -11,8 +11,3 @@ A for now 2D game engine made in Vulkan and soon OpenGL made just for fun (and l
 3. Set to 64-bit
 4. Compile shaders
 5. Voila
-
-### Testing 3
-#### Testing 4
-##### Testing 5
-###### Testing 6
