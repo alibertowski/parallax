@@ -36,5 +36,5 @@ A 2D game engine (for now) made with C++ using Vulkan and soon OpenGL made just 
   * glfw3.lib
 16. Build the project.
 17. Create a folder called "shaders" in the same directory as the built exe (Unless the built exe is in the same directory as the already made "shaders" folder)
-18. Compile the shaders and place them in the newly created "shaders" folder
+18. Compile the shaders in [repository]\shaders\ and place them in the newly created "shaders" folder
 19. Run
