@@ -1,19 +1,24 @@
 # Parallax
 A 2D game engine (for now) made with C++ using Vulkan and soon OpenGL made just for fun (and learning).
 
-## Dependencies
+## Prerequisites
 * [Vulkan](https://vulkan.lunarg.com/sdk/home)
 * [GLFW](https://www.glfw.org/download)
 * GLSL Compiler (I used glslangValidator)
 
-## Building on Windows VS 2019 (As of 4/8/2021 - With Latest Version Dependencies)
+## Installing
+### Linux
+1. Run make
+2. WIP
+
+### Windows - Using VS 2019
 1. Install the Vulkan SDK
 2. Install the GLFW binaries and set them to your preferred directory (Default: Documents\Visual Studio 2019\Libraries\)
 3. Open VS 2019, go to File->New->Project From Existing Code...
 4. Select Visual C++, Next
 5. Type in a project name and the location that the repository was cloned in, Next
 6. Use Visual Studio->Windows application project, Next
-7. Click Next for Debug Configuratino settings
+7. Click Next for Debug Configuration settings
 8. Uncheck 'Same as Debug Configuration' and set NDEBUG as a Preprocessor definition for Release configuration, Finish
 9. Set project to 64 bit (x64)
 10. Go to Project->Properties
