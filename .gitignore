@@ -1,4 +1,7 @@
+# Configuration Files
 vkConfig/
-bin/
 .vscode/
+
+# Binaries
+bin/
 parallax
