@@ -1,13 +1,9 @@
-#include "window.hpp"
-#include "vulkan/renderer.hpp"
+#include "engine.hpp"
 
 int main() {
-    window w{};
-    plxVulkan::renderer r{ &w };
-    w.window_init();
-    r.renderer_init();
-
-    r.cleanup();
-    w.cleanup();
+    engine eng;
+    eng.run();
+    eng.clean_up();
+    
     return 0;
 }

@@ -3,7 +3,7 @@
 
 #include "vulkan/pxPhysicalDevices.hpp"
 
-plxVulkan::pxPhysicalDevices::pxPhysicalDevices(const VkInstance* pInstance){
+parallax_vulkan::pxPhysicalDevices::pxPhysicalDevices(const VkInstance* pInstance){
     instance = pInstance;
 
     uint32_t physcDeviceCount{ 0 };

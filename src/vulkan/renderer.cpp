@@ -12,23 +12,31 @@
 #include "window.hpp"
 #include "settings.hpp"
 #include "vulkan/pxPhysicalDevices.hpp"
-#include "vulkan/layers.hpp"
 #include "vulkan/extensions.hpp"
+
+#ifndef NDEBUG
+#include "vulkan/layers.hpp"
+#endif
+
 
 constexpr int MAX_FRAMES_IN_FLIGHT{ 2 };
 
-plxVulkan::renderer::renderer(window* pWindow){
+parallax_vulkan::renderer::renderer(window* pWindow){
     windowInstance = pWindow;
 }
 
-void plxVulkan::renderer::renderer_init(){
+void parallax_vulkan::renderer::renderer_init(){
     initVulkan();
     mainLoop();
 }
 
-void plxVulkan::renderer::initVulkan(){
+void parallax_vulkan::renderer::initVulkan(){
     createInstance();
-    SetupVulkanDebugger();
+
+    #ifndef NDEBUG
+    setup_vulkan_debugger();
+    #endif
+
     CreateSurface();
     pickPhysicalDevice();
     createLogicalDevice();
@@ -42,7 +50,9 @@ void plxVulkan::renderer::initVulkan(){
     CreateSyncObjects();
 }
 
-void plxVulkan::renderer::cleanup(){
+void parallax_vulkan::renderer::cleanup(){
+    std::cout << "Cleaning Vulkan renderer...\n";
+
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         vkDestroySemaphore(device, renderFinishedSemaphores[i], NULL);
         vkDestroySemaphore(device, imageAvailableSemaphores[i], NULL);
@@ -64,31 +74,31 @@ void plxVulkan::renderer::cleanup(){
 
     vkDestroySwapchainKHR(device, swapchain, NULL);
     vkDestroyDevice(device, NULL);
-    if(enableDebugger){
-        layer.CleanUp();
-    }
+
+    #ifndef NDEBUG
+        layer.clean_up();
+    #endif
 
     vkDestroySurfaceKHR(instance, surface, NULL);
     vkDestroyInstance(instance, NULL);
 }
 
-void plxVulkan::renderer::SetupVulkanDebugger(){
-    if (!enableDebugger) return;
-    
+#ifndef NDEBUG
+void parallax_vulkan::renderer::setup_vulkan_debugger(){    
     layer = layers{ &instance };
-    layer.Init();
+    layer.layers_init();
 }
+#endif
 
-void plxVulkan::renderer::createInstance(){
-    auto requiredLayers{ layers::GetLayers() };
-    auto requiredExtensions{ extensions::GetRequiredInstanceExtensions() };
+void parallax_vulkan::renderer::createInstance(){
+    auto requiredExtensions{ extensions::get_required_instance_extensions() };
 
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pNext = NULL;
-    appInfo.pApplicationName = settings::name;
+    appInfo.pApplicationName = settings::ENGINE_NAME; // TOOD: Create a real name
     appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-    appInfo.pEngineName = settings::name;
+    appInfo.pEngineName = settings::ENGINE_NAME;
     appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.apiVersion = VK_API_VERSION_1_2;
 
@@ -97,16 +107,17 @@ void plxVulkan::renderer::createInstance(){
     createInfo.flags = 0;
     createInfo.pApplicationInfo = &appInfo;
 
-    if(enableDebugger){
-        VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{ layers::PopulateDebuggerMessengerCreateInfo() };
-        createInfo.enabledLayerCount = static_cast<uint32_t>(requiredLayers.size());
-        createInfo.ppEnabledLayerNames = requiredLayers.data();
+    #ifndef NDEBUG
+        auto required_layers{ layers::get_layers() };
+        VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{ layers::populate_debugger_messenger_create_info() };
+        createInfo.enabledLayerCount = static_cast<uint32_t>(required_layers.size());
+        createInfo.ppEnabledLayerNames = required_layers.data();
         createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
-    } else {
+    #else
         createInfo.enabledLayerCount = 0;
         createInfo.ppEnabledLayerNames = NULL;
         createInfo.pNext = NULL;
-    }
+    #endif
 
     createInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());
     createInfo.ppEnabledExtensionNames = requiredExtensions.data();
@@ -116,22 +127,22 @@ void plxVulkan::renderer::createInstance(){
     }
 }
 
-void plxVulkan::renderer::mainLoop(){
+void parallax_vulkan::renderer::mainLoop(){
     std::cout << "Loop started\n";
 
-    while (!glfwWindowShouldClose(windowInstance->GetWindow())) {
+    while (!glfwWindowShouldClose(windowInstance->get_window())) {
         glfwPollEvents();
         DrawFrame();
     }
 }
 
-void plxVulkan::renderer::CreateSurface(){
-    if(glfwCreateWindowSurface(instance, windowInstance->GetWindow(), NULL, &surface) != VK_SUCCESS){
+void parallax_vulkan::renderer::CreateSurface(){
+    if(glfwCreateWindowSurface(instance, windowInstance->get_window(), NULL, &surface) != VK_SUCCESS){
         std::runtime_error{ "Failed to create surface" };
     }
 }
 
-void plxVulkan::renderer::pickPhysicalDevice(){
+void parallax_vulkan::renderer::pickPhysicalDevice(){
     physicalDevices = pxPhysicalDevices{ &instance };
     std::vector<pxPhysicalDevice>& devices { physicalDevices.GetDevices() };
 
@@ -173,10 +184,10 @@ void plxVulkan::renderer::pickPhysicalDevice(){
     }
 }
 
-void plxVulkan::renderer::createLogicalDevice(){
+void parallax_vulkan::renderer::createLogicalDevice(){
     float queuePriority{ 1.0F };
     auto primaryDevice{ physicalDevices.GetPrimaryDevice() };
-    auto deviceExtensions{ extensions::GetRequiredDeviceExtensions() };
+    auto deviceExtensions{ extensions::get_required_device_extensions() };
     std::vector<VkDeviceQueueCreateInfo> queueFamilies;
     std::set<uint32_t> uniqueFamilies{ primaryDevice.GetQueueFamilyIndices().graphicFamilyIndex.value(), primaryDevice.GetQueueFamilyIndices().presentFamilyIndex.value() };
     for(uint32_t queueIndex : uniqueFamilies){
@@ -220,7 +231,7 @@ void plxVulkan::renderer::createLogicalDevice(){
     vkGetDeviceQueue2(device, &presentQueueInfo, &presentQueue);
 }
 
-void plxVulkan::renderer::CreateSwapchain(){
+void parallax_vulkan::renderer::CreateSwapchain(){
     auto primaryDevice{ physicalDevices.GetPrimaryDevice() };
     VkSurfaceCapabilitiesKHR capabilities;
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(primaryDevice.GetPhysicalDevice(), surface, &capabilities);
@@ -295,7 +306,7 @@ void plxVulkan::renderer::CreateSwapchain(){
     swapchainExtent = capabilities.currentExtent;
 }
 
-void plxVulkan::renderer::CreateImageViews(){
+void parallax_vulkan::renderer::CreateImageViews(){
     swapchainImageViews.resize(swapchainImages.size());
     for(size_t i = 0; i < swapchainImages.size(); ++i) { // TODO: Just check this thing when the engine is near finished.
         VkImageViewCreateInfo imgViewCreateInfo{};
@@ -337,7 +348,7 @@ std::vector<char> ReadShader(const std::string& filePath){
     return buffer;
 }
 
-void plxVulkan::renderer::CreateGraphicsPipeline(){
+void parallax_vulkan::renderer::CreateGraphicsPipeline(){
     auto vertShaderBinary{ ReadShader("shaders/shaders.vert.spv") };
     auto fragShaderBinary{ ReadShader("shaders/shaders.frag.spv") };
 
@@ -468,7 +479,7 @@ void plxVulkan::renderer::CreateGraphicsPipeline(){
     vkDestroyShaderModule(device, fragShaderModule, NULL);
 }
 
-void plxVulkan::renderer::CreateRenderPass(){
+void parallax_vulkan::renderer::CreateRenderPass(){
     VkAttachmentDescription attachmentDesc{};
     attachmentDesc.format = swapchainFormat;
     attachmentDesc.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -501,7 +512,7 @@ void plxVulkan::renderer::CreateRenderPass(){
     }
 }
 
-void plxVulkan::renderer::CreateFrameBuffers(){
+void parallax_vulkan::renderer::CreateFrameBuffers(){
     swapChainFramebuffers.resize(swapchainImageViews.size());
 
     for (size_t i = 0; i < swapchainImageViews.size(); i++) {
@@ -524,7 +535,7 @@ void plxVulkan::renderer::CreateFrameBuffers(){
     }
 }
 
-void plxVulkan::renderer::CreateCommandPool(){
+void parallax_vulkan::renderer::CreateCommandPool(){
     auto primaryDevice{ physicalDevices.GetPrimaryDevice() };
 
     VkCommandPoolCreateInfo poolInfo{};
@@ -537,7 +548,7 @@ void plxVulkan::renderer::CreateCommandPool(){
     }
 }
 
-void plxVulkan::renderer::CreateCommandBuffers(){
+void parallax_vulkan::renderer::CreateCommandBuffers(){
     commandBuffers.resize(swapChainFramebuffers.size());
 
     VkCommandBufferAllocateInfo allocInfo{};
@@ -585,7 +596,7 @@ void plxVulkan::renderer::CreateCommandBuffers(){
     }
 }
 
-void plxVulkan::renderer::CreateSyncObjects(){
+void parallax_vulkan::renderer::CreateSyncObjects(){
    imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
@@ -607,7 +618,7 @@ void plxVulkan::renderer::CreateSyncObjects(){
     } 
 }
 
-void plxVulkan::renderer::DrawFrame(){
+void parallax_vulkan::renderer::DrawFrame(){
     vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
     uint32_t imageIndex;
