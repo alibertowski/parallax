@@ -26,5 +26,4 @@ test: ${EXECUTABLE-NAME}
 	${BINARY-FOLDER}/${EXECUTABLE-NAME}
 
 clean:
-	rm -rf ./bin/${EXECUTABLE-NAME}
-	rm -rf ./bin/shaders/*
+	

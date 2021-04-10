@@ -4,25 +4,25 @@
 #include "vulkan/extensions.hpp"
 
 #ifndef NDEBUG
-const std::vector<const char*> requiredDebugExtensions{ "VK_EXT_debug_utils" };
+const std::vector<const char*> required_debug_extensions{ "VK_EXT_debug_utils" };
 #endif
 
-const std::vector<const char*> requiredDeviceExtensions{ "VK_KHR_swapchain"};
+const std::vector<const char*> required_device_extensions{ "VK_KHR_swapchain"};
 
-std::vector<const char*> plxVulkan::extensions::GetRequiredInstanceExtensions(){
-    uint32_t extensionCount{ 0 };
-    auto glfwExtensions { glfwGetRequiredInstanceExtensions(&extensionCount) };
+std::vector<const char*> parallax_vulkan::extensions::get_required_instance_extensions(){
+    uint32_t extension_count{ 0 };
+    auto glfw_extensions { glfwGetRequiredInstanceExtensions(&extension_count) };
+    std::vector<const char*> final_extensions{ glfw_extensions, glfw_extensions + extension_count };
 
-    std::vector<const char*> finalExtensions{ glfwExtensions, glfwExtensions + extensionCount };
     #ifndef NDEBUG
-    for(const auto& extension : requiredDebugExtensions){
-        finalExtensions.push_back(extension);
+    for(const auto& extension : required_debug_extensions){
+        final_extensions.push_back(extension);
     }
     #endif
 
-    return finalExtensions;
+    return final_extensions;
 }
 
-std::vector<const char*> plxVulkan::extensions::GetRequiredDeviceExtensions(){
-    return requiredDeviceExtensions;
+std::vector<const char*> parallax_vulkan::extensions::get_required_device_extensions(){
+    return required_device_extensions;
 }

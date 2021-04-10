@@ -1,3 +1,3 @@
 namespace settings{
-    inline constexpr char name[] { "parallax" };
+    inline constexpr char ENGINE_NAME[] { "parallax" };
 }
