@@ -9,7 +9,7 @@ parallax: src/main.cpp
 	
 	g++ $(CFLAGS) -g -o ${BINARY-FOLDER}/${EXECUTABLE-NAME} $(LDFLAGS) ./src/*.cpp ./src/vulkan/*.cpp
 	
-.PHONY: test clean
+.PHONY: test clean release shaders
 
 release:
 	mkdir -p ./bin
@@ -21,7 +21,6 @@ shaders:
 
 	glslangValidator -V -o ${BINARY-FOLDER}/shaders/shaders.frag.spv shaders/shaders.frag
 	glslangValidator -V -o ${BINARY-FOLDER}/shaders/shaders.vert.spv shaders/shaders.vert
-.PHONY: shaders
 
 test: ${EXECUTABLE-NAME}
 	${BINARY-FOLDER}/${EXECUTABLE-NAME}
