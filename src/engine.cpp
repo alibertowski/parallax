@@ -9,6 +9,6 @@ void engine::run() {
 }
 
 void engine::clean_up(){
-    renderer_.cleanup();
+    renderer_.clean_up();
     window_.clean_up();
 }

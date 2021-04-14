@@ -18,27 +18,26 @@
 #include "vulkan/layers.hpp"
 #endif
 
-
 constexpr int MAX_FRAMES_IN_FLIGHT{ 2 };
 
-parallax_vulkan::renderer::renderer(window* pWindow){
-    windowInstance = pWindow;
+parallax_vulkan::renderer::renderer(window* p_window){
+    window_ = p_window;
 }
 
-void parallax_vulkan::renderer::renderer_init(){
-    initVulkan();
-    mainLoop();
+void parallax_vulkan::renderer::renderer_init() {
+    init_vulkan();
+    main_loop();
 }
 
-void parallax_vulkan::renderer::initVulkan(){
-    createInstance();
+void parallax_vulkan::renderer::init_vulkan() {
+    create_instance();
 
     #ifndef NDEBUG
     setup_vulkan_debugger();
     #endif
 
     CreateSurface();
-    pickPhysicalDevice();
+    pick_physical_device();
     createLogicalDevice();
     CreateSwapchain();
     CreateImageViews();
@@ -50,7 +49,7 @@ void parallax_vulkan::renderer::initVulkan(){
     CreateSyncObjects();
 }
 
-void parallax_vulkan::renderer::cleanup(){
+void parallax_vulkan::renderer::clean_up(){
     std::cout << "Cleaning Vulkan renderer...\n";
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
@@ -76,74 +75,77 @@ void parallax_vulkan::renderer::cleanup(){
     vkDestroyDevice(device, NULL);
 
     #ifndef NDEBUG
-        layer.clean_up();
+        layer_.clean_up();
     #endif
 
-    vkDestroySurfaceKHR(instance, surface, NULL);
-    vkDestroyInstance(instance, NULL);
+    vkDestroySurfaceKHR(instance_, surface, NULL);
+    vkDestroyInstance(instance_, NULL);
 }
 
 #ifndef NDEBUG
 void parallax_vulkan::renderer::setup_vulkan_debugger(){    
-    layer = layers{ &instance };
-    layer.layers_init();
+    layer_ = layers{ &instance_ };
+    layer_.layers_init();
 }
 #endif
 
-void parallax_vulkan::renderer::createInstance(){
-    auto requiredExtensions{ extensions::get_required_instance_extensions() };
+void parallax_vulkan::renderer::create_instance() {
+    uint32_t apiVersion;
+    vkEnumerateInstanceVersion(&apiVersion);
 
-    VkApplicationInfo appInfo{};
-    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pNext = NULL;
-    appInfo.pApplicationName = settings::ENGINE_NAME; // TOOD: Create a real name
-    appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-    appInfo.pEngineName = settings::ENGINE_NAME;
-    appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-    appInfo.apiVersion = VK_API_VERSION_1_2;
+    auto required_extensions{ extensions::get_required_instance_extensions() };
 
-    VkInstanceCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    createInfo.flags = 0;
-    createInfo.pApplicationInfo = &appInfo;
+    VkApplicationInfo app_info{};
+    app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    app_info.pNext = NULL;
+    app_info.pApplicationName = settings::ENGINE_NAME; // TOOD: Create a real application name
+    app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+    app_info.pEngineName = settings::ENGINE_NAME;
+    app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+    app_info.apiVersion = apiVersion;
+
+    VkInstanceCreateInfo create_info{};
+    create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    create_info.flags = 0;
+    create_info.pApplicationInfo = &app_info;
 
     #ifndef NDEBUG
         auto required_layers{ layers::get_layers() };
-        VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{ layers::populate_debugger_messenger_create_info() };
-        createInfo.enabledLayerCount = static_cast<uint32_t>(required_layers.size());
-        createInfo.ppEnabledLayerNames = required_layers.data();
-        createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
+        VkDebugUtilsMessengerCreateInfoEXT debug_create_info{ layers::populate_debugger_messenger_create_info() };
+        create_info.enabledLayerCount = static_cast<uint32_t>(required_layers.size());
+        create_info.ppEnabledLayerNames = required_layers.data();
+        create_info.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debug_create_info;
     #else
-        createInfo.enabledLayerCount = 0;
-        createInfo.ppEnabledLayerNames = NULL;
-        createInfo.pNext = NULL;
+        create_info.enabledLayerCount = 0;
+        create_info.ppEnabledLayerNames = NULL;
+        create_info.pNext = NULL;
     #endif
 
-    createInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());
-    createInfo.ppEnabledExtensionNames = requiredExtensions.data();
+    create_info.enabledExtensionCount = static_cast<uint32_t>(required_extensions.size());
+    create_info.ppEnabledExtensionNames = required_extensions.data();
 
-    if(!vkCreateInstance(&createInfo, NULL, &instance) != VK_SUCCESS){
+    if (!vkCreateInstance(&create_info, NULL, &instance_) != VK_SUCCESS) { // TODO: Check out the pAllocator eventually
         std::runtime_error{ "Failed to create Vulkan instance" };
     }
 }
 
-void parallax_vulkan::renderer::mainLoop(){
+void parallax_vulkan::renderer::main_loop(){
     std::cout << "Loop started\n";
 
-    while (!glfwWindowShouldClose(windowInstance->get_window())) {
+    while (!glfwWindowShouldClose(window_->get_window())) {
         glfwPollEvents();
-        DrawFrame();
+        draw_frame();
     }
 }
 
 void parallax_vulkan::renderer::CreateSurface(){
-    if(glfwCreateWindowSurface(instance, windowInstance->get_window(), NULL, &surface) != VK_SUCCESS){
+    if(glfwCreateWindowSurface(instance_, window_->get_window(), NULL, &surface) != VK_SUCCESS){
         std::runtime_error{ "Failed to create surface" };
     }
 }
 
-void parallax_vulkan::renderer::pickPhysicalDevice(){
-    physicalDevices = pxPhysicalDevices{ &instance };
+void parallax_vulkan::renderer::pick_physical_device(){
+    physicalDevices = pxPhysicalDevices{ &instance_ };
     std::vector<pxPhysicalDevice>& devices { physicalDevices.GetDevices() };
 
     for(pxPhysicalDevice& device : devices){ 
@@ -618,7 +620,7 @@ void parallax_vulkan::renderer::CreateSyncObjects(){
     } 
 }
 
-void parallax_vulkan::renderer::DrawFrame(){
+void parallax_vulkan::renderer::draw_frame(){
     vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
     uint32_t imageIndex;
