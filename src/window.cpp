@@ -40,18 +40,18 @@ void window::window_init(){
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-    window = glfwCreateWindow(640, 480, settings::ENGINE_NAME, NULL, NULL);
-    if(!window){
+    window_ = glfwCreateWindow(640, 480, settings::ENGINE_NAME, NULL, NULL);
+    if(!window_){
         glfwTerminate();
         throw std::runtime_error("GLFW failed to create window");
     }
 
-    glfwSetKeyCallback(window, key_callback);
+    glfwSetKeyCallback(window_, key_callback);
 }
 
 void window::clean_up(){
     std::cout << "Cleaning GLFW...\n";
 
-    glfwDestroyWindow(window);
+    glfwDestroyWindow(window_);
     glfwTerminate();
 }

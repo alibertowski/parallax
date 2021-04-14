@@ -13,21 +13,20 @@ namespace parallax_vulkan{
     class renderer{
     public:
         renderer() = default;
-        renderer(window* pWindow);
+        renderer(window* p_window);
 
         void renderer_init();
-        void cleanup();
+        void clean_up();
     private:
         #ifndef NDEBUG
-        layers layer;
+        layers layer_;
 
         void setup_vulkan_debugger();
         #endif
 
-        window* windowInstance;
+        VkInstance instance_;
+        window* window_;
         VkSurfaceKHR surface;
-
-        VkInstance instance;
         
         pxPhysicalDevices physicalDevices;
         VkDevice device;
@@ -55,12 +54,12 @@ namespace parallax_vulkan{
         std::vector<VkFence> imagesInFlight;
         size_t currentFrame = 0;
 
-        void createInstance();
-        void DrawFrame();
-        void initVulkan();
-        void mainLoop();
+        void init_vulkan();
+        void create_instance();
+        void draw_frame();
+        void main_loop();
         void CreateSurface();
-        void pickPhysicalDevice();
+        void pick_physical_device();
         void createLogicalDevice();
         void CreateSwapchain();
         void CreateImageViews();
