@@ -11,9 +11,7 @@ A 2D game engine (for now) made with C++ using Vulkan and soon OpenGL made just 
 1. Run make
 2. WIP
 
-<details>
-<summary>## Windows - Using VS 2019</summary>
-<br>
+## Windows - Using VS 2019
 1. Install the Vulkan SDK
 2. Install the GLFW binaries and set them to your preferred directory (Default: Documents\Visual Studio 2019\Libraries\)
 3. Open VS 2019, go to File->New->Project From Existing Code...
@@ -40,4 +38,3 @@ A 2D game engine (for now) made with C++ using Vulkan and soon OpenGL made just 
 17. Create a folder called "shaders" in the same directory as the built exe (Unless the built exe is in the same directory as the already made "shaders" folder)
 18. Compile the shaders in [repository]\shaders\ and place them in the newly created "shaders" folder
 19. Run
-</details>
