@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include "engine.hpp"
 
 int main() {
@@ -5,5 +6,5 @@ int main() {
     eng.run();
     eng.clean_up();
     
-    return 0;
+    return EXIT_SUCCESS;
 }
