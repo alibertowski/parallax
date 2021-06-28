@@ -3,11 +3,11 @@
 #include "window.hpp"
 #include "vulkan/renderer.hpp"
 
-class engine{
+class Engine {
 public:
     void run();
     void clean_up();
 private:
-    window window_;
+    Window window_;
     parallax_vulkan::renderer renderer_;
 };

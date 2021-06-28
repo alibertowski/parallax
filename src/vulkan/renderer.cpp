@@ -20,7 +20,7 @@
 
 constexpr int MAX_FRAMES_IN_FLIGHT{ 2 };
 
-parallax_vulkan::renderer::renderer(window* p_window){
+parallax_vulkan::renderer::renderer(Window* p_window){
     window_ = p_window;
 }
 

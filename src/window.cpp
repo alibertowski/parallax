@@ -14,6 +14,8 @@ static void error_callback(int error, const char* description){
 // TODO: Set this into an input class
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+    std::cout << "Window: " << window << "\nScancode: " << scancode << "\nMods: " << mods << '\n';
+
     if(action == GLFW_PRESS){
         switch(key){
             case Input::Keycode::One:
@@ -32,7 +34,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
 }
 
-void window::window_init(){
+void Window::window_init(){
     glfwSetErrorCallback(error_callback);
     if (!glfwInit()){
         throw std::runtime_error{ "GLFW failed to initialize" };    
@@ -49,7 +51,7 @@ void window::window_init(){
     glfwSetKeyCallback(window_, key_callback);
 }
 
-void window::clean_up(){
+void Window::clean_up(){
     std::cout << "Cleaning GLFW...\n";
 
     glfwDestroyWindow(window_);

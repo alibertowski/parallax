@@ -2,7 +2,7 @@
 
 #include <GLFW/glfw3.h>
 
-class window {
+class Window {
 public:
     void window_init();
     void clean_up();
