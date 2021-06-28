@@ -13,7 +13,7 @@ namespace parallax_vulkan{
     class renderer{
     public:
         renderer() = default;
-        renderer(window* p_window);
+        renderer(Window* p_window);
 
         void renderer_init();
         void clean_up();
@@ -25,7 +25,7 @@ namespace parallax_vulkan{
         #endif
 
         VkInstance instance_;
-        window* window_;
+        Window* window_;
         VkSurfaceKHR surface;
         
         pxPhysicalDevices physicalDevices;

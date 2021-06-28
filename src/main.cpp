@@ -2,7 +2,7 @@
 #include "engine.hpp"
 
 int main() {
-    engine eng;
+    Engine eng;
     eng.run();
     eng.clean_up();
 
