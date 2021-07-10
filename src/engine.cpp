@@ -1,6 +1,7 @@
 #include "engine.hpp"
 #include "window.hpp"
 #include "vulkan/renderer.hpp"
+#include <iostream>
 
 void Engine::run() {
     renderer_ = &window_;
@@ -11,4 +12,8 @@ void Engine::run() {
 void Engine::clean_up(){
     renderer_.clean_up();
     window_.clean_up();
+}
+
+Engine::~Engine() {
+    std::cout << "Destructor" << std::endl;
 }
