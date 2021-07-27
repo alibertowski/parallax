@@ -4,21 +4,30 @@
 #include <vector>
 #include "window.hpp"
 #include "pxPhysicalDevices.hpp"
-#include "layers.hpp"
 
-namespace plxVulkan{
+#ifndef NDEBUG
+#include "layers.hpp"
+#endif
+
+namespace parallax_vulkan{
     class renderer{
     public:
-        renderer(window* pWindow);
+        renderer() = default;
+        renderer(Window* p_window);
 
         void renderer_init();
-        void cleanup();
+        void clean_up();
     private:
-        window* windowInstance;
-        VkSurfaceKHR surface;
+        #ifndef NDEBUG
+        Layers layer_;
 
-        VkInstance instance;
-        layers layer;
+        void setup_vulkan_debugger();
+        #endif
+
+        VkInstance instance_;
+        Window* window_;
+        VkSurfaceKHR surface;
+        
         pxPhysicalDevices physicalDevices;
         VkDevice device;
 
@@ -45,14 +54,13 @@ namespace plxVulkan{
         std::vector<VkFence> imagesInFlight;
         size_t currentFrame = 0;
 
-        void createInstance();
-        void DrawFrame();
-        void initVulkan();
-        void mainLoop();
+        void init_vulkan();
+        void create_instance();
+        void draw_frame();
+        void main_loop();
         void CreateSurface();
-        void pickPhysicalDevice();
+        void pick_physical_device();
         void createLogicalDevice();
-        void SetupVulkanDebugger();
         void CreateSwapchain();
         void CreateImageViews();
         void CreateGraphicsPipeline();

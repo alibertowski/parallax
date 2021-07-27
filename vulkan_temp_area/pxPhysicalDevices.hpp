@@ -4,7 +4,7 @@
 #include <vector>
 #include "pxPhysicalDevice.hpp"
 
-namespace plxVulkan{
+namespace parallax_vulkan{
     class pxPhysicalDevices{
     public:
         pxPhysicalDevices() = default;

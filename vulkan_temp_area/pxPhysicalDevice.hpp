@@ -3,7 +3,7 @@
 #include <vulkan/vulkan.h>
 #include <optional>
 
-namespace plxVulkan{
+namespace parallax_vulkan{
     struct queueFamilyIndices{
         std::optional<uint32_t> graphicFamilyIndex;
         std::optional<uint32_t> presentFamilyIndex;
