@@ -1,13 +1,13 @@
 #pragma once
 
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 class Window {
 public:
-    void window_init();
-    void clean_up();
-    inline GLFWwindow* get_window() { return window_; }
+    Window();
+    ~Window();
 
 private:
-    GLFWwindow* window_;
+    GLFWwindow* window;
 };
