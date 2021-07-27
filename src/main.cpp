@@ -1,10 +1,9 @@
-#include <cstdlib>
 #include "engine.hpp"
 
+#include <cstdlib>
+
 int main() {
-    Engine eng;
-    eng.run();
-    eng.clean_up();
+    Engine eng{};
 
     return EXIT_SUCCESS;
 }

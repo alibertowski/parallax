@@ -1,59 +1,77 @@
 #include "window.hpp"
 #include "settings.hpp"
-#include "input.hpp"
+#include "glad/glad.h"
 
-#define GLFW_INCLUDE_VULKAN
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <stdexcept>
 #include <iostream>
 
-static void error_callback(int error, const char* description){
+static void error_callback(int error, const char* description) {
     std::cerr << "Error Code: " << error << ", Description: " << description << '\n';
 }
 
-// TODO: Set this into an input class
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    std::cout << "Window: " << window << "\nScancode: " << scancode << "\nMods: " << mods << '\n';
-
-    if(action == GLFW_PRESS){
-        switch(key){
-            case Input::Keycode::One:
-                std::cout << "One\n";
-                break;
-            case Input::Keycode::Two:
-                std::cout << "Two\n";
-                break;
-            case Input::Keycode::Three:
-                std::cout << "Three\n";
-                break;
-            case Input::Keycode::Four:
-                std::cout << "Four\n";
-                break;
-        }
-    }
+static void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
 }
 
-void Window::window_init(){
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    std::cout << "Key Pressed: " << key << '\n';
+}
+
+Window::Window() {
+    #ifndef NDEBUG
+    std::cout << glfwGetVersionString() << '\n';
+    #endif
+
     glfwSetErrorCallback(error_callback);
-    if (!glfwInit()){
-        throw std::runtime_error{ "GLFW failed to initialize" };    
+    if (!glfwInit()){   
+        throw std::runtime_error{ "GLFW failed to initialize" };
     }
 
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 
-    window_ = glfwCreateWindow(640, 480, settings::ENGINE_NAME, NULL, NULL);
-    if(!window_){
+    window = glfwCreateWindow(Settings::DefaultWidth, Settings::DefaultHeight, Settings::EngineName, NULL, NULL);
+    if(!window){
         glfwTerminate();
         throw std::runtime_error("GLFW failed to create window");
     }
 
-    glfwSetKeyCallback(window_, key_callback);
+    glfwMakeContextCurrent(window);
+
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetKeyCallback(window, key_callback);
+
+    if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        glfwTerminate();
+        throw std::runtime_error("GLAD failed to initialize");
+    }
+
+    while(!glfwWindowShouldClose(window)) {
+        glClearColor(1.0f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+        
+        #ifndef NDEBUG
+        // Gets the deltatime and prints the FPS
+        double deltaTime{ glfwGetTime() };
+        glfwSetTime(0.0);
+      //  std::cout << 1 / deltaTime << '\n';
+        #endif
+    }
 }
 
-void Window::clean_up(){
+Window::~Window() {
+    #ifndef NDEBUG
     std::cout << "Cleaning GLFW...\n";
+    #endif
 
-    glfwDestroyWindow(window_);
+    glfwDestroyWindow(window);
     glfwTerminate();
 }
