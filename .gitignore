@@ -5,3 +5,6 @@ vkConfig/
 bin/
 parallax
 build/
+
+# Lib Object Files
+lib/**/*.o
