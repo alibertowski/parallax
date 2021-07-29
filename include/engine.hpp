@@ -4,6 +4,7 @@
 
 class Engine {
 public:
+    void run();
 private:
     Window window;
 };

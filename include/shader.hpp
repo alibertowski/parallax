@@ -1,12 +1,14 @@
 #pragma once
 
+#include <glad/glad.h>
 #include <string>
 
 class Shader {
 public:
-    Shader(std::string fileName);
+    Shader(const std::string &fileName, const GLenum &shaderType);
+    ~Shader();
 
-    inline const std::string& get_source_code() const { return source_code; };
+    inline const GLuint& get_shader() const { return shader; };
 private:
-    std::string source_code;
+    GLuint shader;
 };
