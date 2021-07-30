@@ -1,7 +1,11 @@
 # Configuration Files
 vkConfig/
+.vscode/settings.json
 
 # Binaries
 bin/
 parallax
 build/
+
+# Lib Object Files
+lib/**/*.o
