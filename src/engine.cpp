@@ -21,29 +21,34 @@ void Engine::run() {
         if (glfwGetKey(window.get_window(), GLFW_KEY_W) == GLFW_PRESS) {
             camera += speed * cam::front;
         } else if (glfwGetKey(window.get_window(), GLFW_KEY_S) == GLFW_PRESS) {
-            camera += speed * glm::vec3(0.0f, 0.0f,  -1.0f);
+            camera += speed * -cam::front;
         } else if (glfwGetKey(window.get_window(), GLFW_KEY_A) == GLFW_PRESS) {
             camera += speed * glm::vec3(1.0f, 0.0f,  0.0f);
         } else if (glfwGetKey(window.get_window(), GLFW_KEY_D) == GLFW_PRESS) {
             camera += speed * glm::vec3(-1.0f, 0.0f,  0.0f);
         }
 
-        glm::mat4 model         = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-        glm::mat4 view          = glm::mat4(1.0f);
         glm::mat4 projection    = glm::mat4(1.0f);
-        model = glm::rotate(model, (float)timeValue * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-        view  = glm::lookAt(camera, camera + cam::front, glm::vec3(0.0f, 1.0f, 0.0f));
-        projection = glm::perspective(glm::radians(75.0f), (static_cast<float>(window.get_width()) / static_cast<float>(window.get_height())), 0.1f, 100.0f);
-        // retrieve the matrix uniform locations
-        unsigned int modelLoc = glGetUniformLocation(r.get_shader_program(), "model");
-        unsigned int viewLoc  = glGetUniformLocation(r.get_shader_program(), "view");
-        // pass them to the shaders (3 different ways)
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+        projection = glm::perspective(glm::radians(75.0f), (static_cast<float>(window.get_width()) / static_cast<float>(window.get_height())), 0.1f, 1000.0f);
         glUniformMatrix4fv(glGetUniformLocation(r.get_shader_program(), "projection"), 1, GL_FALSE, &projection[0][0]);
 
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        for(int i = 0; i < 16; ++i) {
+            for(int j = 0; j < 16; ++j) {
+                for(int f = 0; f < 100; ++f) {
+                    glm::mat4 model         = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+                    glm::mat4 view          = glm::mat4(1.0f);
+                    model = glm::translate(model, glm::vec3(static_cast<float>(i) * 5.0f, static_cast<float>(f) * 5.0f, static_cast<float>(j) * 5.0f));
+                    model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
+                    view  = glm::lookAt(camera, camera + cam::front, glm::vec3(0.0f, 1.0f, 0.0f));
+
+                    unsigned int modelLoc = glGetUniformLocation(r.get_shader_program(), "model");
+                    unsigned int viewLoc  = glGetUniformLocation(r.get_shader_program(), "view");
+                    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+                    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
+            }
+        }
 
         glfwSwapBuffers(window.get_window());
         glfwPollEvents();
