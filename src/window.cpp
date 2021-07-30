@@ -1,10 +1,12 @@
 #include "window.hpp"
 #include "settings.hpp"
 #include "gl_glfw.hpp"
-#include "stb_image.h" // TODO: Do some funky stuff on the wiki to make this work in C++
+#include "engine.hpp"
 
 #include <stdexcept>
 #include <iostream>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp> 
 
 static void glfw_error_callback(int error, const char* description) {
     switch(error) {
@@ -46,13 +48,50 @@ static void glfw_error_callback(int error, const char* description) {
     std::cout << "Description: " << description << std::endl;
 }
 
-static void framebuffer_size_callback(GLFWwindow*, int width, int height) {
+static void framebuffer_size_callback(GLFWwindow* w, int width, int height) {
     glViewport(0, 0, width, height);
+
+    Window* currentWindow{ (Window*)glfwGetWindowUserPointer(w) };
+    currentWindow->set_width(width);
+    currentWindow->set_height(height);
 }
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    std::cout << "Window Pressed: " << window << ", Key Pressed: " << key << ", Scancode Pressed: " << scancode 
-        << ", Action Pressed: " << action << ", Mods Pressed: " << mods << '\n';
+
+static void key_callback(GLFWwindow*, int key, int, int action, int) {
+    if (key == GLFW_KEY_E && action == GLFW_PRESS) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    } else if (key == GLFW_KEY_E && action == GLFW_RELEASE) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+}
+
+float lastX{ Settings::DefaultWidth / 2 };
+float lastY{ Settings::DefaultHeight / 2} ;
+float yaw{ -90.0f };
+float pitch{ 0.0f };
+static void cursor_pos_callback(GLFWwindow*, double xpos, double ypos) {
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; 
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.2f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw   += xoffset;
+    pitch += yoffset;
+
+    if(pitch > 89.0f)
+        pitch = 89.0f;
+    if(pitch < -89.0f)
+        pitch = -89.0f;
+
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cam::front = glm::normalize(direction);
 }
 
 Window::Window() {
@@ -83,6 +122,10 @@ Window::Window() {
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetKeyCallback(window, key_callback);
+    glfwSetCursorPosCallback(window, cursor_pos_callback);
+    glfwSetWindowUserPointer(window, this);
+    glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         glfwTerminate();

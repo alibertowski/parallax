@@ -7,7 +7,7 @@ SHADERSDIR = ./res/shaders/vulkan
 
 CFLAGS = -std=c++17 -Wall -Wextra -iquote $(INCLUDEDIR)
 CFLAGS += -I lib/glad/include -I lib/stb
-LDFLAGS = -lglfw -ldl
+LDFLAGS = -lglfw -ldl -lpthread
 
 SRC = $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(SRCDIR)/**/*.cpp)
 OBJ = $(SRC:$(SRCDIR)/%.cpp=$(BUILDDIR)/%.o)
