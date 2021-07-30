@@ -52,6 +52,7 @@ Renderer::Renderer() {
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
     #endif
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
 
     Shader vertexShader{ "shader.vert", GL_VERTEX_SHADER };
     Shader fragShader{ "shader.frag", GL_FRAGMENT_SHADER };
@@ -115,20 +116,7 @@ Renderer::Renderer() {
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
-    float squareVertices[] = {
-       // positions           // texture coords
-         0.5f,  0.5f, 0.0f, 1.0f, 1.0f, // top right
-         0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // bottom left
-        -0.5f,  0.5f, 0.0f, 0.0f, 1.0f  // top left 
-    };
-
-    unsigned int indices[] = {  // note that we start from 0!
-        0, 1, 3,   // first triangle
-        1, 2, 3    // second triangle
-    };  
-
-    GLuint vbo, ebo;
+    GLuint vbo;
     glGenBuffers(1, &vbo);
     //glGenBuffers(1, &ebo);
 
@@ -136,6 +124,7 @@ Renderer::Renderer() {
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+
 
         // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
