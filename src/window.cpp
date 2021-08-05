@@ -1,12 +1,10 @@
 #include "window.hpp"
 #include "settings.hpp"
 #include "gl_glfw.hpp"
-#include "engine.hpp"
+#include "glfw_service.hpp"
 
 #include <stdexcept>
 #include <iostream>
-#include <glm/glm.hpp>
-#include <glm/ext.hpp> 
 
 static void glfw_error_callback(int error, const char* description) {
     switch(error) {
@@ -56,44 +54,6 @@ static void framebuffer_size_callback(GLFWwindow* w, int width, int height) {
     currentWindow->set_height(height);
 }
 
-
-static void key_callback(GLFWwindow*, int key, int, int action, int) {
-    if (key == GLFW_KEY_E && action == GLFW_PRESS) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    } else if (key == GLFW_KEY_E && action == GLFW_RELEASE) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-}
-
-float lastX{ Settings::DefaultWidth / 2 };
-float lastY{ Settings::DefaultHeight / 2} ;
-float yaw{ -90.0f };
-float pitch{ 0.0f };
-static void cursor_pos_callback(GLFWwindow*, double xpos, double ypos) {
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; 
-    lastX = xpos;
-    lastY = ypos;
-
-    float sensitivity = 0.2f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    yaw   += xoffset;
-    pitch += yoffset;
-
-    if(pitch > 89.0f)
-        pitch = 89.0f;
-    if(pitch < -89.0f)
-        pitch = -89.0f;
-
-    glm::vec3 direction;
-    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    direction.y = sin(glm::radians(pitch));
-    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cam::front = glm::normalize(direction);
-}
-
 Window::Window() {
     #ifndef NDEBUG
     std::cout << glfwGetVersionString() << std::endl;
@@ -122,8 +82,6 @@ Window::Window() {
 
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetCursorPosCallback(window, cursor_pos_callback);
     glfwSetWindowUserPointer(window, this);
     glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -132,6 +90,8 @@ Window::Window() {
         glfwTerminate();
         throw std::runtime_error("GLAD failed to initialize");
     }
+
+    GLFW::set_primary_window(window);
 }
 
 Window::~Window() {
