@@ -1,7 +1,7 @@
 #include "glfw_service.hpp"
 #include "gl_glfw.hpp"
 
-static GLFWwindow* window;
+static GLFWwindow* window{ nullptr };
 
 GLFWwindow* GLFW::get_primary_window() {
     return window;

@@ -35,6 +35,7 @@ $(OBJ): $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
 	g++ $(CFLAGS) -c -g -o $@ $<
 
 release:
+	make clean
 	mkdir -p ${BINARYDIR}/shaders/vulkan
 	
 	glslangValidator -V -o ${BINARYDIR}/shaders/vulkan/shaders.frag.spv $(SHADERSDIR)/shaders.frag
@@ -44,3 +45,4 @@ release:
 clean:
 	rm -rf $(BINARYDIR)
 	rm -rf $(BUILDDIR)
+	rm -f lib/glad/src/glad.o

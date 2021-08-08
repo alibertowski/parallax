@@ -1,14 +1,15 @@
 #include "camera.hpp"
-#include "mouse.hpp"
-#include "settings.hpp"
 #include "glfw_service.hpp"
+#include "engine.hpp"
+#include "mouse.hpp"
+#include "window.hpp"
+#include "time.hpp"
 
 #include <glad/glad.h>
-#include <glm/glm.hpp>
-#include <glm/ext.hpp> 
+#include <glm/ext/vector_float3.hpp>
 #include <glm/mat4x4.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <memory>
+#include <glm/trigonometric.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
 #include <iostream>
 
 glm::mat4 Camera::calculate_view() {
@@ -36,17 +37,21 @@ glm::mat4 Camera::calculate_view() {
 }
 
 glm::mat4 Camera::get_projection() {
-    return glm::mat4{ 1.0f };
+    Window* window{ Engine::PrimaryEngine->get_window() };
+    return glm::perspective(glm::radians(75.0f), (static_cast<float>(window->get_width()) / static_cast<float>(window->get_height())), 0.1f, 1000.0f);
 }
 
 void Camera::update() {
-    std::unique_ptr<Mouse> m{ Mouse::create_mouse() };
-    float xoffset{ m->get_x_pos() - lastX };
-    float yoffset{ lastY - m->get_y_pos() }; 
-    lastX = m->get_x_pos();
-    lastY = m->get_y_pos();
+    Mouse* mouse{ Engine::PrimaryEngine->get_mouse() };
+    int currentX{ mouse->get_x_pos() };
+    int currentY{ mouse->get_y_pos() };
 
-    constexpr float sensitivity{ 0.2f };
+    float xoffset{ currentX - lastX };
+    float yoffset{ lastY - currentY }; 
+    lastX = currentX;
+    lastY = currentY;
+
+    const float sensitivity{ 10.0f * Time::get_delta_time()};
     xoffset *= sensitivity;
     yoffset *= sensitivity;
 
@@ -64,7 +69,7 @@ void Camera::update() {
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
     cframe.set_look_vector(-direction);
 
-    constexpr float speed{ 0.5f };
+    const float speed{ 10.0f * Time::get_delta_time() };
     if (glfwGetKey(GLFW::get_primary_window(), GLFW_KEY_W) == GLFW_PRESS) {
         glm::vec3 pos{ -cframe.get_look_vector() * speed };
         cframe.set_position(cframe.get_position() + pos);
@@ -89,6 +94,7 @@ void Camera::update() {
         cframe.set_position(cframe.get_position() + pos);
     }
 
+    // TODO: Make this changable through a graphic API wrapper instead of directly
     int fKeyAction{ glfwGetKey(GLFW::get_primary_window(), GLFW_KEY_F) };
     if (fKeyAction == GLFW_PRESS) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

@@ -9,7 +9,7 @@ public:
     Renderer();
     ~Renderer();
 
-    inline GLuint get_shader_program() const { return shader_program; };
+    void render_frame();
 private:
     VAO vao;
     GLuint shader_program;
