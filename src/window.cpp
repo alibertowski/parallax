@@ -6,6 +6,10 @@
 #include <stdexcept>
 #include <iostream>
 
+Window* Window::create_window() {
+    return new GLFWWindow{};
+}
+
 static void glfw_error_callback(int error, const char* description) {
     switch(error) {
         case GLFW_NO_ERROR:
@@ -49,12 +53,12 @@ static void glfw_error_callback(int error, const char* description) {
 static void framebuffer_size_callback(GLFWwindow* w, int width, int height) {
     glViewport(0, 0, width, height);
 
-    Window* currentWindow{ (Window*)glfwGetWindowUserPointer(w) };
+    GLFWWindow* currentWindow{ static_cast<GLFWWindow*>(glfwGetWindowUserPointer(w)) };
     currentWindow->set_width(width);
     currentWindow->set_height(height);
 }
 
-Window::Window() {
+GLFWWindow::GLFWWindow() {
     #ifndef NDEBUG
     std::cout << glfwGetVersionString() << std::endl;
     #endif
@@ -74,31 +78,30 @@ Window::Window() {
     glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
     glfwWindowHint(GLFW_SAMPLES, 4);
 
-    window = glfwCreateWindow(Settings::DefaultWidth, Settings::DefaultHeight, Settings::EngineName, nullptr, nullptr);
-    if(!window){
+    GLFW::set_primary_window(glfwCreateWindow(Settings::DefaultWidth, Settings::DefaultHeight, Settings::EngineName, nullptr, nullptr));
+    GLFWwindow* createdWindow{ GLFW::get_primary_window() };
+    if(!createdWindow){
         glfwTerminate();
         throw std::runtime_error("GLFW failed to create window");
     }
 
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetWindowUserPointer(window, this);
-    glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwMakeContextCurrent(createdWindow);
+    glfwSetFramebufferSizeCallback(createdWindow, framebuffer_size_callback);
+    glfwSetWindowUserPointer(createdWindow, this);
+    glfwSetInputMode(createdWindow, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    glfwSetInputMode(createdWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         glfwTerminate();
         throw std::runtime_error("GLAD failed to initialize");
     }
-
-    GLFW::set_primary_window(window);
 }
 
-Window::~Window() {
+GLFWWindow::~GLFWWindow() {
     #ifndef NDEBUG
     std::cout << "Cleaning GLFW" << std::endl;
     #endif
 
-    glfwDestroyWindow(window);
+    glfwDestroyWindow(GLFW::get_primary_window() );
     glfwTerminate();
 }

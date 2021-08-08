@@ -2,7 +2,6 @@
 
 #include <glm/mat4x4.hpp>
 #include <glm/ext/vector_float3.hpp>
-#include <iostream>
 
 glm::mat4 CoordinateFrame::get_matrix() {
     glm::mat4 translation = glm::mat4(1.0f); // Identity matrix by default
