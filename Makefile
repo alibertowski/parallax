@@ -19,6 +19,7 @@ OBJ_LIB = $(SRC_LIB:lib/%.c=lib/%.o)
 
 # TODO: Update shader compilation for both vulkan/openGL eventually
 # TODO: Update to compile library files
+
 # Compile the .o files into a debuggable executable
 ${BINARYDIR}/$(EXECUTABLE): $(OBJ) $(OBJ_LIB)
 	mkdir -p ${BINARYDIR}/shaders/vulkan

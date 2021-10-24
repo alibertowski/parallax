@@ -12,6 +12,10 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <iostream>
 
+Camera::Camera() {
+    cframe.set_position(glm::vec3{ 5.0f, 2.0f, 5.0f });
+}
+
 glm::mat4 Camera::calculate_view() {
     glm::vec3 position{ cframe.get_position() };
     glm::vec3 lookVector{ cframe.get_look_vector() };
@@ -101,4 +105,6 @@ void Camera::update() {
     } else if (fKeyAction == GLFW_RELEASE) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
+
+    collision.set_position(cframe.get_position());
 }

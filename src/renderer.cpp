@@ -111,8 +111,8 @@ static std::vector<float> get_cube_vertices() {
     std::vector<float> updatedVertices{};
     constexpr float SideOffset{ 1.0f };
     constexpr int XCount{ 16 };
-    constexpr int YCount{ 50 };
-    constexpr int ZCount{ 2 };
+    constexpr int YCount{ 1 };
+    constexpr int ZCount{ 10 };
     for (int x{ 0 }; x < XCount; ++x)
     {
         for (int y{ 0 }; y < YCount; ++y)
@@ -296,6 +296,7 @@ void Renderer::render_frame() {
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cam->calculate_view()));
 
     glm::mat4 model{ glm::mat4{ 1.0f } };
+ //   model = glm::scale(model, glm::vec3{ 10.0f, 10.0f, 10.0f });
     GLint modelLoc{ glGetUniformLocation(shader_program, "model") };
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
