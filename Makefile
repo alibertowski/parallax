@@ -7,7 +7,7 @@ SHADERSDIR = ./res/shaders/vulkan
 
 CFLAGS = -std=c++17 -Wall -Wextra -iquote $(INCLUDEDIR)
 CFLAGS += -I lib/glad/include -I lib/stb
-LDFLAGS = -lglfw -ldl -lpthread
+LDFLAGS = -lglfw -ldl
 
 SRC = $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(SRCDIR)/**/*.cpp)
 OBJ = $(SRC:$(SRCDIR)/%.cpp=$(BUILDDIR)/%.o)
@@ -18,7 +18,9 @@ OBJ_LIB = $(SRC_LIB:lib/%.c=lib/%.o)
 .PHONY: clean release
 
 # TODO: Update shader compilation for both vulkan/openGL eventually
-# TODO: Update to compile library files
+# TODO: Update to compile library files easier
+# TODO: Make a cleaner Makefile
+
 # Compile the .o files into a debuggable executable
 ${BINARYDIR}/$(EXECUTABLE): $(OBJ) $(OBJ_LIB)
 	mkdir -p ${BINARYDIR}/shaders/vulkan
@@ -35,6 +37,7 @@ $(OBJ): $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
 	g++ $(CFLAGS) -c -g -o $@ $<
 
 release:
+	make clean
 	mkdir -p ${BINARYDIR}/shaders/vulkan
 	
 	glslangValidator -V -o ${BINARYDIR}/shaders/vulkan/shaders.frag.spv $(SHADERSDIR)/shaders.frag
@@ -44,3 +47,4 @@ release:
 clean:
 	rm -rf $(BINARYDIR)
 	rm -rf $(BUILDDIR)
+	rm -f lib/glad/src/glad.o

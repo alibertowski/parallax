@@ -1,12 +1,14 @@
 #include "window.hpp"
 #include "settings.hpp"
 #include "gl_glfw.hpp"
-#include "engine.hpp"
+#include "glfw_service.hpp"
 
 #include <stdexcept>
 #include <iostream>
-#include <glm/glm.hpp>
-#include <glm/ext.hpp> 
+
+Window* Window::create_window() {
+    return new GLFWWindow{};
+}
 
 static void glfw_error_callback(int error, const char* description) {
     switch(error) {
@@ -51,50 +53,12 @@ static void glfw_error_callback(int error, const char* description) {
 static void framebuffer_size_callback(GLFWwindow* w, int width, int height) {
     glViewport(0, 0, width, height);
 
-    Window* currentWindow{ (Window*)glfwGetWindowUserPointer(w) };
+    GLFWWindow* currentWindow{ static_cast<GLFWWindow*>(glfwGetWindowUserPointer(w)) };
     currentWindow->set_width(width);
     currentWindow->set_height(height);
 }
 
-
-static void key_callback(GLFWwindow*, int key, int, int action, int) {
-    if (key == GLFW_KEY_E && action == GLFW_PRESS) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    } else if (key == GLFW_KEY_E && action == GLFW_RELEASE) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-}
-
-float lastX{ Settings::DefaultWidth / 2 };
-float lastY{ Settings::DefaultHeight / 2} ;
-float yaw{ -90.0f };
-float pitch{ 0.0f };
-static void cursor_pos_callback(GLFWwindow*, double xpos, double ypos) {
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; 
-    lastX = xpos;
-    lastY = ypos;
-
-    float sensitivity = 0.2f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    yaw   += xoffset;
-    pitch += yoffset;
-
-    if(pitch > 89.0f)
-        pitch = 89.0f;
-    if(pitch < -89.0f)
-        pitch = -89.0f;
-
-    glm::vec3 direction;
-    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    direction.y = sin(glm::radians(pitch));
-    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cam::front = glm::normalize(direction);
-}
-
-Window::Window() {
+GLFWWindow::GLFWWindow() {
     #ifndef NDEBUG
     std::cout << glfwGetVersionString() << std::endl;
     #endif
@@ -112,20 +76,20 @@ Window::Window() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+    glfwWindowHint(GLFW_SAMPLES, 4);
 
-    window = glfwCreateWindow(Settings::DefaultWidth, Settings::DefaultHeight, Settings::EngineName, nullptr, nullptr);
-    if(!window){
+    GLFW::set_primary_window(glfwCreateWindow(Settings::DefaultWidth, Settings::DefaultHeight, Settings::EngineName, nullptr, nullptr));
+    GLFWwindow* createdWindow{ GLFW::get_primary_window() };
+    if(!createdWindow){
         glfwTerminate();
         throw std::runtime_error("GLFW failed to create window");
     }
 
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetCursorPosCallback(window, cursor_pos_callback);
-    glfwSetWindowUserPointer(window, this);
-    glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwMakeContextCurrent(createdWindow);
+    glfwSetFramebufferSizeCallback(createdWindow, framebuffer_size_callback);
+    glfwSetWindowUserPointer(createdWindow, this);
+    glfwSetInputMode(createdWindow, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    glfwSetInputMode(createdWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         glfwTerminate();
@@ -133,11 +97,11 @@ Window::Window() {
     }
 }
 
-Window::~Window() {
+GLFWWindow::~GLFWWindow() {
     #ifndef NDEBUG
     std::cout << "Cleaning GLFW" << std::endl;
     #endif
 
-    glfwDestroyWindow(window);
+    glfwDestroyWindow(GLFW::get_primary_window() );
     glfwTerminate();
 }

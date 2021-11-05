@@ -5,17 +5,24 @@
 
 class Window {
 public:
-    Window();
-    ~Window();
+    virtual ~Window() = default;
+    
+    virtual int get_width() const = 0;
+    virtual int get_height() const = 0;
 
-    inline GLFWwindow* get_window() const { return window; };
-    inline int get_width() const { return width; };
-    inline int get_height() const { return height; };
+    static Window* create_window();
+};
 
-    inline void set_width(int w) { width = w; };
-    inline void set_height(int h) { height = h; }; 
+class GLFWWindow : public Window {
+public:
+    GLFWWindow();
+    virtual ~GLFWWindow() override;
+
+    virtual inline int get_width() const override { return width; };
+    virtual inline int get_height() const override { return height; };
+    inline void set_width(int newWidth) { width = newWidth; };
+    inline void set_height(int newHeight) { height = newHeight; };
 private:
-    GLFWwindow* window;
     int width{ Settings::DefaultWidth };
     int height{ Settings::DefaultHeight };
 };
