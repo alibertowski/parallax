@@ -15,7 +15,7 @@ A 2D game engine (for now) made with C++ using Vulkan and OpenGL made just for f
 
 ### Windows - Using MSVC 2019
 1. Download the required dependencies
-2. Install the libraries someone on your system
+2. Install the libraries somewhere on your system
 3. Open the x64 MSVC Build tools and cd into this project
 4. Open "Make.bat" and edit the variables to the correct paths
 5. Run "Make.bat"
