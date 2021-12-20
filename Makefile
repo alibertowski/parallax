@@ -15,11 +15,12 @@ OBJ = $(SRC:$(SRCDIR)/%.cpp=$(BUILDDIR)/%.o)
 SRC_LIB = lib/glad/src/glad.c
 OBJ_LIB = $(SRC_LIB:lib/%.c=lib/%.o)
 
-.PHONY: clean release
+.PHONY: clean release release-gl
 
 # TODO: Update shader compilation for both vulkan/openGL eventually
 # TODO: Update to compile library files easier
 # TODO: Make a cleaner Makefile
+# TODO: Update to compile c files with gcc
 
 # Compile the .o files into a debuggable executable
 ${BINARYDIR}/$(EXECUTABLE): $(OBJ) $(OBJ_LIB)
@@ -43,8 +44,13 @@ release:
 	glslangValidator -V -o ${BINARYDIR}/shaders/vulkan/shaders.frag.spv $(SHADERSDIR)/shaders.frag
 	glslangValidator -V -o ${BINARYDIR}/shaders/vulkan/shaders.vert.spv $(SHADERSDIR)/shaders.vert
 	g++ $(CFLAGS) -O3 -D NDEBUG -o ${BINARYDIR}/${EXECUTABLE} $(LDFLAGS) $(SRC) $(SRC_LIB)
+	
+release-gl:
+	make clean
+	g++ $(CFLAGS) -O3 -D NDEBUG -o ${BINARYDIR}/${EXECUTABLE} $(LDFLAGS) $(SRC) $(SRC_LIB)
 
 clean:
 	rm -rf $(BINARYDIR)
 	rm -rf $(BUILDDIR)
 	rm -f lib/glad/src/glad.o
+	
