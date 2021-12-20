@@ -2,8 +2,8 @@
 A 2D game engine (for now) made with C++ using Vulkan and OpenGL made just for fun (and learning).
 
 ## Prerequisites
-* [Vulkan](https://www.vulkan.org/tools#download-these-essential-development-tools)
-* [GLFW](https://www.glfw.org/download)
+* [Vulkan](https://www.vulkan.org/)
+* [GLFW](https://www.glfw.org/)
 * GLSL Compiler (I used glslangValidator)
 
 ## Installing
