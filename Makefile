@@ -5,52 +5,57 @@ BUILDDIR = ./build
 SRCDIR = ./src
 SHADERSDIR = ./res/shaders/vulkan
 
-CFLAGS = -std=c++17 -Wall -Wextra -iquote $(INCLUDEDIR)
+CFLAGS = -Wall -Wextra -iquote $(INCLUDEDIR)
 CFLAGS += -I lib/glad/include -I lib/stb
 LDFLAGS = -lglfw -ldl
 
 SRC = $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(SRCDIR)/**/*.cpp)
 OBJ = $(SRC:$(SRCDIR)/%.cpp=$(BUILDDIR)/%.o)
 
-SRC_LIB = lib/glad/src/glad.c
-OBJ_LIB = $(SRC_LIB:lib/%.c=lib/%.o)
+SRC_C = lib/glad/src/glad.c
+OBJ_C = $(SRC_C:%.c=$(BUILDDIR)/%.o)
 
-.PHONY: clean release release-gl
+SRC_TEST = $(wildcard ./test/*.cpp)
+
+.PHONY: clean release test
 
 # TODO: Update shader compilation for both vulkan/openGL eventually
 # TODO: Update to compile library files easier
 # TODO: Make a cleaner Makefile
-# TODO: Update to compile c files with gcc
 
 # Compile the .o files into a debuggable executable
-${BINARYDIR}/$(EXECUTABLE): $(OBJ) $(OBJ_LIB)
-	mkdir -p ${BINARYDIR}/shaders/vulkan
+$(BINARYDIR)/$(EXECUTABLE): $(OBJ) $(OBJ_C)
+	mkdir -p $(BINARYDIR)/shaders/vulkan
 
-	glslangValidator -V -o ${BINARYDIR}/shaders/vulkan/shaders.frag.spv $(SHADERSDIR)/shaders.frag
-	glslangValidator -V -o ${BINARYDIR}/shaders/vulkan/shaders.vert.spv $(SHADERSDIR)/shaders.vert
+	glslangValidator -V -o $(BINARYDIR)/shaders/vulkan/shaders.frag.spv $(SHADERSDIR)/shaders.frag
+	glslangValidator -V -o $(BINARYDIR)/shaders/vulkan/shaders.vert.spv $(SHADERSDIR)/shaders.vert
 
-	g++ -g -o ${BINARYDIR}/${EXECUTABLE} $(LDFLAGS) $^
+	g++ -g -o $(BINARYDIR)/$(EXECUTABLE) $(LDFLAGS) $^
 
 # Compile .cpp files into .o
 $(OBJ): $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
 	mkdir -p $(@D)
 
-	g++ $(CFLAGS) -c -g -o $@ $<
+	g++ $(CFLAGS) -std=c++17 -c -g -o $@ $<
+
+# Compile .c files into .o
+$(OBJ_C): $(BUILDDIR)/%.o: %.c
+	mkdir -p $(@D)
+
+	gcc $(CFLAGS) -std=c17 -c -g -o $@ $<
 
 release:
 	make clean
-	mkdir -p ${BINARYDIR}/shaders/vulkan
+	mkdir -p $(BINARYDIR)/shaders/vulkan
 	
-	glslangValidator -V -o ${BINARYDIR}/shaders/vulkan/shaders.frag.spv $(SHADERSDIR)/shaders.frag
-	glslangValidator -V -o ${BINARYDIR}/shaders/vulkan/shaders.vert.spv $(SHADERSDIR)/shaders.vert
-	g++ $(CFLAGS) -O3 -D NDEBUG -o ${BINARYDIR}/${EXECUTABLE} $(LDFLAGS) $(SRC) $(SRC_LIB)
-	
-release-gl:
-	make clean
-	g++ $(CFLAGS) -O3 -D NDEBUG -o ${BINARYDIR}/${EXECUTABLE} $(LDFLAGS) $(SRC) $(SRC_LIB)
+	glslangValidator -V -o $(BINARYDIR)/shaders/vulkan/shaders.frag.spv $(SHADERSDIR)/shaders.frag
+	glslangValidator -V -o $(BINARYDIR)/shaders/vulkan/shaders.vert.spv $(SHADERSDIR)/shaders.vert
+	g++ $(CFLAGS) -std=c++17 -O3 -D NDEBUG -o $(BINARYDIR)/$(EXECUTABLE) $(LDFLAGS) $(SRC) $(SRC_C)
 
 clean:
 	rm -rf $(BINARYDIR)
 	rm -rf $(BUILDDIR)
-	rm -f lib/glad/src/glad.o
-	
+
+test:
+	mkdir -p $(BINARYDIR)
+	g++ $(CFLAGS) -std=c++17 -O3 -D NDEBUG -o $(BINARYDIR)/parallax-tests $(SRC_TEST)
