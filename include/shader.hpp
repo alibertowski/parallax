@@ -5,7 +5,7 @@
 
 class Shader {
 public:
-    Shader(const std::string &fileName, const GLenum &shaderType);
+    Shader(const std::string &fileName, GLenum shaderType);
     ~Shader();
 
     inline const GLuint& get_shader() const { return shader; };
