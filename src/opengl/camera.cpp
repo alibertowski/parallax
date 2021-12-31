@@ -9,7 +9,7 @@
 #include <glm/ext/matrix_transform.hpp>
 
 void Camera2::update_camera(GLuint program) {
-   auto window{ Engine::PrimaryEngine->get_window() };
+  // auto window{ Engine::PrimaryEngine->get_window() };
    constexpr float DistancePerSecond{ 1.0f };
    const float DistanceMoving{ DistancePerSecond * Time::get_delta_time() };
 
@@ -29,7 +29,12 @@ void Camera2::update_camera(GLuint program) {
       model = glm::translate(model, glm::vec3{ DistanceMoving, 0.0f, 0.0f });
    }
 
-   projection = glm::ortho(0.0f, static_cast<float>(window->get_width()), static_cast<float>(window->get_height()), 0.0f, -9999.0f, 9999.0f);
+   if (is_orthographic) {
+      projection = glm::mat4{ 1.0f };
+      // projection = glm::ortho(0.0f, static_cast<float>(window->get_width()), static_cast<float>(window->get_height()), 0.0f, -9999.0f, 9999.0f);
+   } else {
+      projection = glm::mat4{ 1.0f };
+   }
 
    GLint modelLoc = glGetUniformLocation(program, "model");
    GLint viewLoc = glGetUniformLocation(program, "view");
