@@ -4,6 +4,7 @@ A 2D game engine (for now) made with C++ using Vulkan and OpenGL made just for f
 ## Prerequisites
 * [Vulkan](https://www.vulkan.org/)
 * [GLFW](https://www.glfw.org/)
+* [GLM](https://github.com/g-truc/glm)
 * GLSL Compiler (I used glslangValidator)
 
 ## Installing
