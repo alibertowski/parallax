@@ -5,7 +5,7 @@
 
 class Image {
 public:
-    Image(std::string fileName);
+    Image(const std::string& fileName);
     ~Image();
 
     inline const stbi_uc* get_image_data() const { return image_data; };

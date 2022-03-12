@@ -88,8 +88,6 @@ GLFWWindow::GLFWWindow() {
     glfwMakeContextCurrent(createdWindow);
     glfwSetFramebufferSizeCallback(createdWindow, framebuffer_size_callback);
     glfwSetWindowUserPointer(createdWindow, this);
-    glfwSetInputMode(createdWindow, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-    glfwSetInputMode(createdWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         glfwTerminate();

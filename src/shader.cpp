@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <iostream>
 
-Shader::Shader(const std::string &fileName, const GLenum &shaderType) {
+Shader::Shader(const std::string &fileName, GLenum shaderType) {
     constexpr char ShaderFileDirectory[] { "../res/shaders/opengl/" };
     std::string filePath{ ShaderFileDirectory + fileName };
     std::ifstream shaderFile{ filePath };

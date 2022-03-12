@@ -4,7 +4,7 @@
 #include <stb_image.h>
 #include <iostream>
 
-Image::Image(std::string fileName) {
+Image::Image(const std::string& fileName) {
     constexpr char ImageDirectory[]{ "../res/textures/" };
     std::string filePath{ ImageDirectory + fileName };
 
