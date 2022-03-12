@@ -1,5 +1,5 @@
 # Parallax
-A 2D game engine (for now) made with C++ using Vulkan and OpenGL made just for fun (and learning).
+A 2D game engine made with C++ using Vulkan and OpenGL made just for fun
 
 ## Prerequisites
 * [Vulkan](https://www.vulkan.org/)

@@ -3,11 +3,12 @@ echo "Currently this only builds an optimized version"
 echo "Compiling and linking"
 echo "-----------------------------------"
 
-set glfw-include-path=C:\Users\Alex\Documents\Visual Studio 2019\Libraries\glfw-3.3.5.bin.WIN64\include
-set glfw-lib-path=C:\Users\Alex\Documents\Visual Studio 2019\Libraries\glfw-3.3.5.bin.WIN64\lib-vc2019
-set glm-include-path=C:\Users\Alex\Documents\Visual Studio 2019\Libraries\glm
+set user=Temp
+set glfw-include-path=C:\Users\%user%\Documents\Visual Studio 2019\Libraries\glfw-3.3.5.bin.WIN64\include
+set glfw-lib-path=C:\Users\%user%\Documents\Visual Studio 2019\Libraries\glfw-3.3.5.bin.WIN64\lib-vc2019
+set glm-include-path=C:\Users\%user%\Documents\Visual Studio 2019\Libraries\glm
 
-set project-path=C:\Users\Alex\source\repos\parallax
+set project-path=C:\Users\%user%\source\repos\parallax
 
 md build
 md bin
