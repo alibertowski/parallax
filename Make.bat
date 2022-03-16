@@ -13,5 +13,5 @@ set project-path=C:\Users\%user%\source\repos\parallax
 md build
 md bin
 
-cl.exe /O2 /EHsc /nologo /DNDEBUG /W4 /std:c++17 /MD /GS /Fe%project-path%\bin\parallax.exe /Fo%project-path%\build\ /I"%glm-include-path%" /I"%glfw-include-path%" /I%project-path%\lib\glad\include /I%project-path%\lib\stb /I%project-path%\include src\*.cpp lib/glad/src/glad.c /link /NOLOGO /MACHINE:X64 /LIBPATH:"%glfw-lib-path%" glfw3.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib
+cl.exe /O2 /EHsc /nologo /DNDEBUG /W4 /std:c++17 /MD /GS /Fe%project-path%\bin\parallax.exe /Fo%project-path%\build\ /I"%glm-include-path%" /I"%glfw-include-path%" /I%project-path%\lib\glad\include /I%project-path%\lib\stb /I%project-path%\include src\*.cpp src\opengl\*.cpp lib/glad/src/glad.c /link /NOLOGO /MACHINE:X64 /LIBPATH:"%glfw-lib-path%" glfw3.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib
 pause
