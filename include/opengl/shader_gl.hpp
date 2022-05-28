@@ -3,10 +3,10 @@
 #include <glad/glad.h>
 #include <string>
 
-class Shader {
+class ShaderGL {
 public:
-    Shader(const std::string &fileName, GLenum shaderType);
-    ~Shader();
+    ShaderGL(const std::string &fileName, GLenum shaderType);
+    ~ShaderGL();
 
     inline const GLuint& get_shader() const { return shader; };
 private:

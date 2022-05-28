@@ -1,5 +1,5 @@
-#include "glfw_service.hpp"
-#include "gl_glfw.hpp"
+#include "lowsystems/glfw_service.hpp"
+#include "opengl/gl_glfw.hpp"
 
 static GLFWwindow* window{ nullptr };
 

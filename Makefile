@@ -55,7 +55,8 @@ release:
 clean:
 	rm -rf $(BINARYDIR)
 	rm -rf $(BUILDDIR)
+	rm -rf ./test/parallax-tests
 
 test:
-	mkdir -p $(BINARYDIR)
-	g++ $(CFLAGS) -std=c++17 -O3 -D NDEBUG -o $(BINARYDIR)/parallax-tests $(SRC_TEST)
+	mkdir -p ./test
+	g++ $(CFLAGS) -lgtest -std=c++17 -O3 -D NDEBUG -o ./test/parallax-tests $(SRC_TEST)

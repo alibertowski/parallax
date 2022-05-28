@@ -1,10 +1,13 @@
-#include "window.hpp"
-#include "settings.hpp"
-#include "gl_glfw.hpp"
-#include "glfw_service.hpp"
-
 #include <stdexcept>
 #include <iostream>
+#include <glad/glad.h>
+
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+
+#include "lowsystems/window.hpp"
+#include "settings.hpp"
+#include "lowsystems/glfw_service.hpp"
 
 Window* Window::create_window() {
     return new GLFWWindow{};

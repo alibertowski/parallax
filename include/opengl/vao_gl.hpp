@@ -2,10 +2,10 @@
 
 #include <glad/glad.h>
 
-class VAO {
+class VAOGL {
 public:
-    VAO();
-    ~VAO();
+    VAOGL();
+    ~VAOGL();
 
     void bind();
 private:

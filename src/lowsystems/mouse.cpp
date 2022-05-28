@@ -1,7 +1,7 @@
-#include "mouse.hpp"
-#include "gl_glfw.hpp"
-#include "engine.hpp"
-#include "glfw_service.hpp"
+#include "lowsystems/mouse.hpp"
+#include "opengl/gl_glfw.hpp"
+#include "lowsystems/engine.hpp"
+#include "lowsystems/glfw_service.hpp"
 
 Mouse* Mouse::create_mouse() {
     return new GLFWMouse{};

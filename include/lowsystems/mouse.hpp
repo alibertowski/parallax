@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gl_glfw.hpp"
+#include "opengl/gl_glfw.hpp"
 
 class Mouse {
 public:

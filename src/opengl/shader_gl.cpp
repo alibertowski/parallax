@@ -1,12 +1,12 @@
-#include "shader.hpp"
-
 #include <fstream>
 #include <string>
 #include <iterator>
 #include <stdexcept>
 #include <iostream>
 
-Shader::Shader(const std::string &fileName, GLenum shaderType) {
+#include "opengl/shader_gl.hpp"
+
+ShaderGL::ShaderGL(const std::string &fileName, GLenum shaderType) {
     constexpr char ShaderFileDirectory[] { "../res/shaders/opengl/" };
     std::string filePath{ ShaderFileDirectory + fileName };
     std::ifstream shaderFile{ filePath };
@@ -32,6 +32,6 @@ Shader::Shader(const std::string &fileName, GLenum shaderType) {
     }
 }
 
-Shader::~Shader() {
+ShaderGL::~ShaderGL() {
     glDeleteShader(shader);
 }

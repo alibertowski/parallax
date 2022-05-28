@@ -1,13 +1,7 @@
 #include <gtest/gtest.h>
 
-// Tests that the Foo::Bar() method does Abc.
-TEST(FooTest, MethodBarDoesAbc) {
-  EXPECT_EQ(1, 0);
-}
-
-// Tests that Foo does Xyz.
 TEST(FooTest, DoesXyz) {
-  EXPECT_EQ(1, 0);
+  EXPECT_EQ(1, 1);
 }
 
 int main(int argc, char **argv) {

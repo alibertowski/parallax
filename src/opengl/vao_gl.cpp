@@ -1,15 +1,15 @@
-#include "vao.hpp"
-
 #include <glad/glad.h>
 
-VAO::VAO() {
+#include "opengl/vao_gl.hpp"
+
+VAOGL::VAOGL() {
     glGenVertexArrays(1, &vao);
 }
 
-VAO::~VAO() {
+VAOGL::~VAOGL() {
     glDeleteVertexArrays(1, &vao);
 }
 
-void VAO::bind() {
+void VAOGL::bind() {
     glBindVertexArray(vao);
 }
