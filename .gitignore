@@ -1,5 +1,4 @@
 # Configuration Files
-vkConfig/
 .vscode/settings.json
 .vscode/launch.json
 .vscode/tasks.json
@@ -7,8 +6,4 @@ vkConfig/
 
 # Binaries
 bin/
-parallax
 build/
-
-# Lib Object Files
-lib/**/*.o

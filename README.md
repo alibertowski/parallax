@@ -1,3 +1,4 @@
+# This repository is in the progress of being reworked
 # Parallax
 A 2D game engine made with C++ using Vulkan and OpenGL made just for fun
 
