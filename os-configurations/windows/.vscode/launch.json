@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "C/C++: cl.exe build and debug parallax",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "parallax.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}\\bin\\debug",
+            "environment": [],
+            "console": "externalTerminal",
+            "preLaunchTask": "NMAKE: build debug"
+        }
+    ],
+    "version": "2.0.0"
+}
