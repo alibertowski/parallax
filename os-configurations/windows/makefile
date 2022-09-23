@@ -8,11 +8,12 @@ RBUILD_DIR=build\release
 
 SRC_DIR=src
 
-CFLAGS=/c /EHsc /std:c++20 /W4 /nologo
-CDFLAGS=/Od /Zi /Fd$(DBUILD_DIR)\ /Fo$(DBUILD_DIR)^\
-CRFLAGS=/DNDEBUG /O2 /Fo$(RBUILD_DIR)^\
+CFLAGS=/c /EHsc /std:c++20 /W4 /nologo /I "C:\Users\Alter\Documents\cpp-libraries\include"
+CDFLAGS=/Od /Zi /Fd$(DBUILD_DIR)\ /Fo$(DBUILD_DIR)\ /MTd
+CRFLAGS=/DNDEBUG /O2 /Fo$(RBUILD_DIR)\ /MT
 
-LFLAGS=/NOLOGO
+S_LIBS=glfw3_mt.lib User32.lib Gdi32.lib Shell32.lib
+LFLAGS=/NOLOGO /LIBPATH:"C:\Users\Alter\Documents\cpp-libraries\lib"
 LDFLAGS=/DEBUG /ILK:$(DBUILD_DIR)\$(NAME).ilk /PDB:$(DBUILD_DIR)\ /OUT:$(DBIN_DIR)\$(NAME).exe
 LRFLAGS=/OUT:$(RBIN_DIR)\$(NAME).exe
 
@@ -27,7 +28,7 @@ $(DBIN_DIR)\$(NAME).exe: $(DOBJ)
 	IF NOT EXIST bin MD bin
 	IF NOT EXIST bin\debug MD bin\debug
 
-	LINK $(LFLAGS) $(LDFLAGS) $**
+	LINK $(LFLAGS) $(LDFLAGS) $(S_LIBS) $**
 
 # Compile source files to debug .obj files
 {$(SRC_DIR)\}.cpp{$(DBUILD_DIR)\}.obj:
@@ -49,7 +50,7 @@ $(RBIN_DIR)\$(NAME).exe: $(ROBJ)
 	IF NOT EXIST bin MD bin
 	IF NOT EXIST bin\release MD bin\release
 
-	LINK $(LFLAGS) $(LRFLAGS) $**
+	LINK $(LFLAGS) $(LRFLAGS) $(S_LIBS) $**
 
 # Compile source files to optimized .obj files
 {$(SRC_DIR)\}.cpp{$(RBUILD_DIR)\}.obj:
